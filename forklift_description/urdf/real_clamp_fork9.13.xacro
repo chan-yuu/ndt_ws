@@ -1,0 +1,328 @@
+<?xml version="1.0" ?>
+<!--/*
+ * @Author: CYUN && cyun@tju.enu.cn
+ * @Date: 2024-09-14 16:19:43
+ * @LastEditors: CYUN && cyun@tju.enu.cn
+ * @LastEditTime: 2024-09-15 14:23:00
+ * @FilePath: /src/forklift_description/urdf/real_clamp_fork9.13.xacro
+ * @Description: 用于实车的模型urdf
+ * 
+ * Copyright (c) 2024 by Tianjin University, All Rights Reserved. 
+ */
+-->
+<robot name="$(arg roboname)" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 属性封装 -->
+  <xacro:property name="wheelbase" value="1.77"/>
+  <xacro:property name="front_wheel_length" value="0.975"/>
+  <xacro:property name="rear_wheel_length" value="0.975"/>
+  <xacro:property name="front_wheel_radius" value="0.335"/>
+  <xacro:property name="rear_wheel_radius" value="0.2175"/> 
+  <xacro:property name="PI" value="3.1415926835897931"/>
+  <!-- 67 43.5车轮直径 -->
+    
+  <!-- 规划算法碰撞检测 -->
+  <xacro:property name="base_length" value="2.695"/>
+  <xacro:property name="base_width" value="0.68"/>
+  <xacro:property name="base_height" value="1.370"/>
+
+
+  <!-- 属性封装 -->
+
+  <!-- base -->
+  <xacro:property name="base_collision_height" value="0.875"/>
+  <xacro:property name="base_mass" value="956"/>
+  <xacro:property name="base_mass_ixx" value="343.0"/>
+  <xacro:property name="base_mass_iyy" value="728.0"/>
+  <xacro:property name="base_mass_izz" value="772.0"/>
+
+  <!--Car Body-->
+  <link name="base_link">
+    <collision>
+      <origin xyz="0.65 0 0.5" rpy="0 0 0"/>  
+      <geometry>
+        <box size="3.8 1.2 1.45"/>
+      </geometry>
+    </collision>
+    <!-- <visual>
+      <origin xyz="0.65 0 0.5" rpy="0 0 0"/>  
+      <geometry>
+        <box size="3.8 1.2 1.45"/>
+      </geometry>
+    </visual> -->
+  </link>
+
+  <link name="base_footprint">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>  
+      <geometry>
+        <mesh filename="package://forklift_description/meshes/tractorassembly100.obj" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="base_joint" type="fixed">
+      <origin xyz="0.85 0 0" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="base_link" />
+  </joint>
+
+  <link name="rear_wheel_r">
+  </link>
+  <joint name="base_joint_w_r" type="fixed">
+      <origin xyz="-1.2 -0.4875 -0.3" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="rear_wheel_r" />
+  </joint>
+
+  <link name="rear_wheel_l">
+  </link>
+  <joint name="base_joint_w_l" type="fixed">
+      <origin xyz=" -1.2 0.4875 -0.3" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="rear_wheel_l" />
+  </joint>
+
+  <link name="front_wheel_l">
+  </link>
+  <joint name="front_joint_w_l" type="fixed">
+      <origin xyz="0.65 0.4875 0" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="front_wheel_l" />
+  </joint>
+
+  <link name="front_wheel_r">
+  </link>
+  <joint name="front_joint_w_r" type="fixed">
+      <origin xyz="0.65 -0.4875 0" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="front_wheel_r" />
+  </joint>
+
+  <link name="front_axle">
+  </link>
+
+  <joint name="base_foot_to_front" type="fixed">
+      <origin xyz="0.65 0 0" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="front_axle" />
+  </joint>
+
+  <link name="front_front_axle">
+  </link>
+
+  <joint name="base_foot_to_front_front" type="fixed">
+      <origin xyz="2.14 0 0" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="front_front_axle" />
+  </joint>
+  
+  
+  <link name="rslidar">
+  </link>
+  <joint name="base_foot_to_lidar" type="fixed">
+      <origin xyz="-0.4 0 1.5" rpy="0 0 0" />
+      <parent link="base_footprint" />
+      <child link="rslidar" />
+  </joint>
+
+  <!-- <joint name="rear_right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="rear_right_wheel_link"/>
+    <origin xyz="${front_tyre_x} ${-front_tyre_y} ${front_tyre_r}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.1"/>
+    <limit effort="100000" velocity="10000" />
+    <joint_properties damping="0.0" friction="0.0" />
+  </joint>
+
+  <link name="rear_right_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+        <cylinder length="${rear_tyre_length}" radius="${rear_tyre_r}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 -${PI/2}"/>
+      <geometry>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${rear_tyre_mass}"/>
+      <inertia
+        ixx="${rear_tyre_mass_ixx}"  ixy="0.000000"  ixz="0.000000"
+        iyy="${rear_tyre_mass_iyy}"  iyz="0.000000"
+        izz="${rear_tyre_mass_izz}"/>
+    </inertial>
+  </link>
+
+  <joint name="rear_left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="rear_left_wheel_link"/>
+    <origin xyz="${front_tyre_x} ${front_tyre_y} ${front_tyre_r}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.1"/>
+    <limit effort="100000" velocity="10000" />
+    <joint_properties damping="0.0" friction="0.0" />
+  </joint>
+
+  <link name="rear_left_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+        <cylinder length="${rear_tyre_length}" radius="${rear_tyre_r}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${PI/2}"/>
+      <geometry>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
+        <cylinder length="${rear_tyre_length}" radius="${rear_tyre_r}"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${rear_tyre_mass}"/>
+      <inertia
+        ixx="${rear_tyre_mass_ixx}"  ixy="0.000000"  ixz="0.000000"
+        iyy="${rear_tyre_mass_iyy}"  iyz="0.000000"
+        izz="${rear_tyre_mass_izz}"/>
+    </inertial>
+  </link> 
+
+  <joint name="front_right_steering_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="front_right_steering_link"/>
+    <origin xyz="${-rear_tyre_x} ${-rear_tyre_y} ${rear_tyre_r}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-str_angle}" upper="${str_angle}" effort="1000000.0" velocity="10000.0"/>
+    <dynamics damping="10.0" friction="0.0"/>
+  </joint>
+
+  <link name="front_right_steering_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+        <cylinder length="${str_length}" radius="${str_radius}"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${str_mass}"/>
+      <inertia
+      ixx="${str_mass_ixx}"  ixy="0.000000"  ixz="0.000000"
+      iyy="${str_mass_iyy}"  iyz="0.000000"
+      izz="${str_mass_izz}"/>
+    </inertial>
+  </link>
+
+
+  <joint name="front_right_wheel_joint" type="continuous">
+    <parent link="front_right_steering_link"/>
+    <child link="front_right_wheel_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.1"/>
+    <limit effort="1000000" velocity="10000" />
+    <joint_properties damping="0.0" friction="0.0" />
+  </joint>
+
+  <link name="front_right_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+        <cylinder length="${front_tyre_length}" radius="${front_tyre_r}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 -${PI/2}"/>
+      <geometry>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
+        <cylinder length="${front_tyre_length}" radius="${front_tyre_r}"/>
+      </geometry>  
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${front_tyre_mass}"/>
+      <inertia
+        ixx="${front_tyre_mass_ixx}"  ixy="0.000000"  ixz="0.000000"
+        iyy="${front_tyre_mass_iyy}"  iyz="0.000000"
+        izz="${front_tyre_mass_izz}"/>
+    </inertial>
+  </link>
+
+  <joint name="front_left_steering_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="front_left_steering_link"/>
+    <origin xyz="${-rear_tyre_x} ${rear_tyre_y} ${rear_tyre_r}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-str_angle}" upper="${str_angle}" effort="1000000.0" velocity="10000.0"/>
+    <dynamics damping="10.0" friction="0.0"/>
+  </joint>
+
+  <link name="front_left_steering_link">
+
+    <visual>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+        <cylinder length="${str_length}" radius="${str_radius}"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${str_mass}"/>
+      <inertia
+      ixx="${str_mass_ixx}"  ixy="0.000000"  ixz="0.000000"
+      iyy="${str_mass_iyy}"  iyz="0.000000"
+      izz="${str_mass_izz}"/>
+    </inertial>
+  </link>
+
+
+  <joint name="front_left_wheel_joint" type="continuous">
+    <parent link="front_left_steering_link"/>
+    <child link="front_left_wheel_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.1"/>
+    <limit effort="1000000" velocity="10000" />
+    <joint_properties damping="0.0" friction="0.0" />
+  </joint>
+
+  <link name="front_left_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+        <cylinder length="${front_tyre_length}" radius="${front_tyre_r}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${PI/2}"/>
+      <geometry>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
+      </geometry>  
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${front_tyre_mass}"/>
+      <inertia
+        ixx="${front_tyre_mass_ixx}"  ixy="0.000000"  ixz="0.000000"
+        iyy="${front_tyre_mass_iyy}"  iyz="0.000000"
+        izz="${front_tyre_mass_izz}"/>
+    </inertial>
+  </link>   -->
+
+</robot>
