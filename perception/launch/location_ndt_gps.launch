@@ -1,0 +1,44 @@
+<launch>
+
+    <!-- ==============gps================== -->
+    <node name="gps_imu_node" pkg="perception" type="gps_imu_pub" output="screen">
+        <param name="loopRate" value="100" />
+        <param name="ifname" value="can1" />
+        <param name="global_pos_X" value="0" />
+        <param name="global_pos_Y" value="0" />
+    </node>
+    
+    <!-- ===========gps_in_ndt_map========== -->
+    <!-- <param name="map_in_world_x" value="388538.0161"/>
+    <param name="map_in_world_y" value="4963400.1189"/>
+    <param name="map_in_world_z" value="0.0"/>
+    <param name="map_in_world_roll" value="0.02702"/>
+    <param name="map_in_world_pitch" value="2.0502"/>
+    <param name="map_in_world_yaw" value="86.2207"/> -->
+    <param name="map_in_world_x" value="375539.4742"/>
+    <param name="map_in_world_y" value="4969527.8328"/>
+    <param name="map_in_world_z" value="0.0"/>
+    <param name="map_in_world_roll" value="1.1046"/>
+    <param name="map_in_world_pitch" value="0.89928"/>
+    <param name="map_in_world_yaw" value="1.2956"/>
+
+    <node pkg="perception" type="tf_odom_publisher" name="tf_odom_publisher" output="screen">
+    </node>
+    <!-- ================================== -->
+
+
+    <!-- ==============ndt_localizer================== -->
+    <include file="$(find ndt_localizer)/launch/ndt_localizer.launch"/>
+    <!-- ============================================= -->
+
+
+    <!-- ==============odom================== -->
+    <param name="source_frame" value="front_axle" />
+    <param name="target_frame" value="map" />
+    <param name="odom_frame" value="map"/>
+    <param name="child_frame" value="front_front_axle"/>
+    <node name="odom_pub" pkg="perception" type="odom_pub" output="screen">
+    </node>
+    <!-- ================================ -->
+
+</launch>
